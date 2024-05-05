@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: python -V
+
+  test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: python teste.py
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Bandit
+        run: pip install bandit
+      - name: Run Bandit
+        run: bandit -r . -f json -o bandit_results.json
+      - name: Upload Bandit Results
+        uses: actions/upload-artifact@v2
+        with:
+          name: bandit-results
+          path: bandit_results.json
+
+  send-notification:
+    needs: security-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Notification
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d '{
+            "content": "Um novo Pull Request foi aberto em ${{ github.repository }} por ${{ github.actor }}."
+          }' ${{ secrets.DISCORD_WEBHOOK_URL }}
+          
+  deploy-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "Finalizado!"
