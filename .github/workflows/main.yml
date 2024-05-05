@@ -38,11 +38,29 @@ jobs:
     needs: security-scan
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord Notification
-        run: |
-          curl -X POST -H "Content-Type: application/json" -d '{
-            "content": "Um novo Pull Request foi aberto em ${{ github.repository }} por ${{ github.actor }}."
-          }' ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Test Success
+    uses: rjstone/discord-webhook-notify@v1
+    if: success()
+    with:
+        severity: info
+        details: Test Succeeded!
+        webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+        
+      - name: Test Failure
+    uses: rjstone/discord-webhook-notify@v1
+    if: failure()
+    with:
+        severity: error
+        details: Test Failed!
+        webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+        
+- name: Test Cancelled
+    uses: rjstone/discord-webhook-notify@v1
+    if: cancelled()
+    with:
+        severity: warn
+        details: Test Cancelled!
+        webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           
   deploy-job:
     runs-on: ubuntu-latest
