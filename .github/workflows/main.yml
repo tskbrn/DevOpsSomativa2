@@ -42,7 +42,7 @@ jobs:
         run: |
           curl -X POST -H "Content-Type: application/json" -d '{
             "content": "Um novo Pull Request foi aberto em ${{ github.repository }} por ${{ github.actor }}."
-          }' ${{ secrets.DISCORD_WEBHOOK_URL }}
+          }' ${{ secrets.https://discord.com/api/webhooks/1236511168894472242/2J0UM4yXSDgGTucKPDIVNrMfPgmwgosM5enK3SPs9eIaTEcaDQ6qP_fVV6ChWrmxVhmM }}
           
   deploy-job:
     runs-on: ubuntu-latest
